@@ -19,18 +19,18 @@ import CoreGraphics
 
 open class RadarChartRenderer: LineRadarRenderer
 {
-    private func accessibilityXLabels() -> [String] {
+    private func accessibilityXLabels(dataSet: IRadarChartDataSet) -> [String] {
         var labels: [String] = []
-
+        
         guard let chart = chart else { return [] }
         guard let formatter = chart.xAxis.valueFormatter else { return [] }
-
-        let maxEntryCount = chart.data?.maxEntryCountSet?.entryCount ?? 0
-        for i in stride(from: 0, to: maxEntryCount, by: 1)
+        
+        let entryCount = dataSet.entryCount;
+        for i in stride(from: 0, to: entryCount, by: 1)
         {
             labels.append(formatter.stringForValue(Double(i), axis: chart.xAxis))
         }
-
+        
         return labels
     }
 
@@ -106,7 +106,7 @@ open class RadarChartRenderer: LineRadarRenderer
         // This is done, so that the labels are narrated in decreasing order of their corresponding value
         // Otherwise, there is no non-visual logic to the data presented
         let accessibilityEntryValues =  Array(0 ..< entryCount).map { (dataSet.entryForIndex($0)?.y ?? 0, $0) }
-        let accessibilityAxisLabelValueTuples = zip(accessibilityXLabels(), accessibilityEntryValues).map { ($0, $1.0, $1.1) }.sorted { $0.1 > $1.1 }
+        let accessibilityAxisLabelValueTuples = zip(accessibilityXLabels(dataSet: dataSet), accessibilityEntryValues).map { ($0, $1.0, $1.1) }.sorted { $0.1 > $1.1 }
         let accessibilityDataSetDescription: String = description + ". \(entryCount) \(prefix + (entryCount == 1 ? "" : "s")). "
         let accessibilityFrameWidth: CGFloat = 22.0 // To allow a tap target of 44x44
 
